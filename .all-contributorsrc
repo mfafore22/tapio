@@ -1,0 +1,58 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "brylie",
+      "name": "Brylie Christopher Oxley",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17307?v=4",
+      "profile": "https://github.com/brylie",
+      "contributions": [
+        "infra",
+        "test",
+        "doc",
+        "bug",
+        "business",
+        "content",
+        "ideas",
+        "maintenance",
+        "mentoring",
+        "projectManagement",
+        "promotion",
+        "research",
+        "review",
+        "code"
+      ]
+    },
+    {
+      "login": "AkiKurvinen",
+      "name": "AkiKurvinen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/74042688?v=4",
+      "profile": "https://akikurvinen.fi/",
+      "contributions": [
+        "data",
+        "code"
+      ]
+    },
+    {
+      "login": "ResendeTech",
+      "name": "ResendeTech",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142721352?v=4",
+      "profile": "https://github.com/ResendeTech",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": true,
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "projectName": "tapio",
+  "projectOwner": "finntegrate"
+}
