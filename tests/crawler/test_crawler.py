@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 from pydantic import HttpUrl
 
 from tapio.config.config_models import CrawlerConfig, SiteConfig
-from tapio.crawler.crawler import BaseCrawler
+from tapio.crawler.client import BaseCrawler
 
 
 def create_test_site_config(
