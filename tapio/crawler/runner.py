@@ -1,76 +1,61 @@
-import asyncio
-import logging
-
-from tapio.config.config_models import SiteConfig
-from tapio.crawler.client import BaseCrawler, CrawlResult
-
+import os
+from urllib.parse import urlparse
+from datetime import datetime, timezone
+from tapio.crawler.client import start_crawl, wait_for_crawl
 
 class CrawlerRunner:
-    """
-    Runs an async crawler process to crawl websites and save HTML content.
+    def __init__(self, account_id: str, api_token: str , output_base_dir: str = "content"):
+       self.account_id = account_id
+       self.api_token = api_token
+       self.output_base_dir = output_base_dir
 
-    This class provides a high-level interface to run a crawler using site configurations
-    and collect the scraped results.
-    """
+    def run(self , site_name , url: str) -> int:
 
-    def __init__(self) -> None:
-        """
-        Initialize the crawler runner with logging configuration.
-        """
-        self.logger = logging.getLogger(__name__)
-        self.setup_logging()
+        print(f"Starting crawl for {site_name} at {url}")
 
-    def setup_logging(self) -> None:
-        """
-        Set up logging configuration for the crawler runner.
-        """
-        logging.basicConfig(
-            level=logging.INFO,
-            format="%(asctime)s [%(levelname)s] %(message)s",
-            handlers=[logging.StreamHandler()],
-        )
+        job_id = start_crawl(self.account_id, self.api_token, url)
+        print(f" Job started: {job_id}")
 
-    async def run_async(
-        self,
-        site_name: str,
-        site_config: SiteConfig,
-    ) -> list[CrawlResult]:
-        """
-        Run the crawler asynchronously and return crawled page data.
+        result = wait_for_crawl(self.account_id, job_id, self.api_token)
+        records = result.get("records", [])
 
-        Args:
-            site_name: Name/identifier of the site being crawled.
-            site_config: Site configuration containing all crawler settings.
+        print(f"Got {len(records)} records")
 
-        Returns:
-            List of CrawlResult dictionaries containing page data.
-        """
-        self.logger.info(f"Starting async crawl for site '{site_name}' with URL: {site_config.base_url}")
+        saved_count = 0
+        for record in records:
+            if record.get("status") != "completed":
+                continue
+            self._save_record(site_name, record)
+            saved_count += 1
+        
+        print(f"Saved {saved_count} files")
+        return saved_count
+    
+    def _save_record(self , site_name: str , record: dict):
+       output_dir = os.path.join(self.output_base_dir, site_name, "parsed")
+       os.makedirs(output_dir, exist_ok=True)
 
-        # Create and configure the crawler
-        crawler = BaseCrawler(site_name, site_config)
+       filepath = os.path.join(output_dir, f"{self._url_to_filename(record['url'])}.md")
+       content = self._build_frontmatter(record) + record.get("markdown", "")
 
-        # Run the crawler
-        results = await crawler.crawl()
+       with open(filepath, "w", encoding="utf-8") as f:
+           f.write(content)
+    
+    def _url_to_filename(self, url) -> str:
+        path = urlparse(url).path.strip("/")
 
-        self.logger.info(f"Async crawling completed. Processed {len(results)} items.")
-        return results
+        if not path:
+            return "index"
+        
+        return path.replace("/", "-").lower()
+    
+    def _build_frontmatter(self , record:dict) -> str:
+        title = record.get("metadata",  {}).get("title", "Untitled")
+        source_url = record["url"]
+        timestamp = datetime.now(timezone.utc).isoformat()
 
-    def run(
-        self,
-        site_name: str,
-        site_config: SiteConfig,
-    ) -> list[CrawlResult]:
-        """
-        Run the crawler synchronously and return crawled page data.
-
-        This is a convenience method that wraps the async version.
-
-        Args:
-            site_name: Name/identifier of the site being crawled.
-            site_config: Site configuration containing all crawler settings.
-
-        Returns:
-            List of CrawlResult dictionaries containing page data.
-        """
-        return asyncio.run(self.run_async(site_name, site_config))
+        return f""" 
+title: "{title}"
+source_url: "{source_url}"
+crawl_timestamp: "{timestamp}"
+"""
