@@ -1,12 +1,10 @@
 """
-Crawler module for migri-assistant.
+Crawler module for migri-assitant.
 
-This module contains the base crawler class and runner for crawling websites
-and saving HTML content. The crawler focuses solely on retrieving and saving
-HTML content without parsing or processing it.
+Uses cloudflare / crawl API to fetch and parse web content
+
 """
 
-from tapio.crawler.crawler import BaseCrawler
-from tapio.crawler.runner import CrawlerRunner
+from tapio.crawler.client import start_crawl, wait_for_crawl
 
-__all__ = ["BaseCrawler", "CrawlerRunner"]
+__all__ = ["start_crawl", "wait_for_crawl"]

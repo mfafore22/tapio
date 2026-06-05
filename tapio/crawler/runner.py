@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from tapio.config.config_models import SiteConfig
-from tapio.crawler.crawler import BaseCrawler, CrawlResult
+from tapio.crawler.client import BaseCrawler, CrawlResult
 
 
 class CrawlerRunner:
