@@ -1,7 +1,7 @@
 import httpx
 import time
 def start_crawl(account_id: str, api_token: str, url: str) -> str:
-    endpoint = f"https://api.com/client/v4/accounts/{account_id}/browser-rendering/crawl"
+    endpoint = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/browser-rendering/crawl"
 
     headers = {
         "Authorization": f"Bearer {api_token}",
@@ -13,20 +13,20 @@ def start_crawl(account_id: str, api_token: str, url: str) -> str:
     }
 
     response = httpx.post(endpoint, json=payload, headers = headers)
-    response.raise_for_status
+    response.raise_for_status()
     data = response.json()
     job_id = data["result"]
 
     return job_id
 
 
-def wait_for_crawl(account_id: str , job_Id: str, api_token: str) -> dict:
+def wait_for_crawl(account_id: str , job_id: str, api_token: str) -> dict:
     max_Attempts = 60
     delay_ms = 5000
 
     for i in range(max_Attempts):
-        url = f"https://api.com/client/v4/accounts/{account_id}/browser-rendering/crawl"
-       
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/browser-rendering/crawl/{job_id}?limit=1"
+
         headers = {
             "Authorization": f"Bearer {api_token}",
 
@@ -51,6 +51,8 @@ def crawl_site(account_id:str, api_token: str, url: str) -> dict:
     job_id = start_crawl(account_id, api_token, url)
 
     result = wait_for_crawl(account_id, job_id, api_token)
+
+    return result
 
 
 
